@@ -1,0 +1,108 @@
+kubernetes/dashboard: General-purpose web UI for Kubernetes clusters https://github.com/kubernetes/dashboard
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
+
+http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/login
+
+
+
+kubectl get pod --namespace=kube-system | grep dashboard
+
+kubectl get service --namespace=kube-system | grep kubernetes-dashboard-nodeport
+
+kubectl describe pod
+
+kubectl get deployments --all-namespaces
+
+kubectl get rs --all-namespaces
+
+kubectl get jobs --all-namespaces
+
+kubectl delete deployment kubernetes-dashboard-local --namespace=kube-system
+
+kubectl delete pods <pod> --grace-period=0 --force
+https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/
+
+kubectl Cheat Sheet - Kubernetes https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+
+Tutorial : Getting Started with Kubernetes with Docker on Mac
+https://rominirani.com/tutorial-getting-started-with-kubernetes-with-docker-on-mac-7f58467203fd
+
+
+kubectl config get-contexts
+
+kubectl config use-context docker-for-desktop
+
+kubectl get pods
+
+kubectl run hello-nginx --image=nginx --port=80
+
+kubectl run --generator=deployment/apps.v1 is DEPRECATED and will be removed in a future version. Use kubectl run --generator=run-pod/v1 or kubectl create instead.
+deployment.apps/hello-nginx created
+
+
+kubectl get deployments
+kubectl get services
+kubectl describe service hello-nginx
+kubectl scale --replicas=3 deployment/hello-nginx
+
+kubectl get deployments
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+hello-nginx   3/3     3            3           2m32s
+
+
+kubectl expose deployment hello-nginx --type=NodePort
+kubectl describe service hello-nginx
+
+kubectl expose deployment nginx — port 80 — target-port 80 — name nginx
+
+
+Bypassing authentication for the local Kubernetes Cluster Dashboard | Premier Developer https://devblogs.microsoft.com/premier-developer/bypassing-authentication-for-the-local-kubernetes-cluster-dashboard/
+
+--enable-skip-login
+--disable-settings-authorizer
+# https://github.com/kubernetes/dashboard/blob/8822c4c9cc2c5e752e8ce46eb21408559fd5f511/aio/deploy/alternative.yaml#L185
+# https://stackoverflow.com/a/46720109
+kubectl -n kube-system get secret
+
+
+TOKEN 1 Liner
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | awk '/^deployment-controller-token-/{print $1}') | awk '$1=="token:"{print $2}'
+
+
+helm chart
+helm install stable/kubernetes-dashboard --name dashboard \
+    --set=enableSkipLogin=true,rbac.clusterAdminRole=true
+https://forums.docker.com/t/docker-for-mac-kubernetes-dashboard/44116/10
+
+
+kubectl cluster-info
+
+
+https://kubernetes.io/docs/tasks/access-application-cluster/service-access-application-cluster/
+
+kubectl describe services hello-nginx
+Name:                     hello-nginx
+Namespace:                default
+Labels:                   run=hello-nginx
+Annotations:              <none>
+Selector:                 run=hello-nginx
+Type:                     NodePort
+IP:                       10.98.219.175
+LoadBalancer Ingress:     localhost
+Port:                     <unset>  80/TCP
+TargetPort:               80/TCP
+NodePort:                 <unset>  30429/TCP
+Endpoints:                10.1.0.10:80,10.1.0.8:80,10.1.0.9:80
+Session Affinity:         None
+External Traffic Policy:  Cluster
+Events:                   <none>
+
+kubectl get pods --selector="run=hello-nginx" --output=wide
+
+https://stackoverflow.com/questions/41509439/whats-the-difference-between-clusterip-nodeport-and-loadbalancer-service-types
+For each port that mynodeportservice listens on a nodeport in the range of 30000 - 32767 will be randomly chosen. So that External clients that are outside the cluster can hit that ClusterIP service that exists inside the cluster. Lets say that our 3 K8s host nodes have IPs 10.10.10.1, 10.10.10.2, 10.10.10.3, the Kubernetes service is listening on port 80, and the Nodeport picked at random was 31852.
+
+Service - Kubernetes https://kubernetes.io/docs/concepts/services-networking/service/
+
+http://kubernetes.docker.internal:30429/
